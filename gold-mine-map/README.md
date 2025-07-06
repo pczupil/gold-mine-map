@@ -65,7 +65,7 @@ A comprehensive Next.js application for tracking mineral mines across the world 
    # Run database migrations
    npx prisma migrate dev --name init
    
-   # (Optional) Seed the database with sample data
+   # Seed the database with sample data
    npx prisma db seed
    ```
 
@@ -76,6 +76,55 @@ A comprehensive Next.js application for tracking mineral mines across the world 
 
 6. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 🌍 Seed Data
+
+The application comes with comprehensive seed data including **20+ major mines** from around the world:
+
+### **Gold Mines (5)**
+- **Carlin Gold Mine** (USA) - 1.2M oz/year
+- **Grasberg Mine** (Indonesia) - 2.5M oz/year  
+- **Muruntau Gold Mine** (Uzbekistan) - 2.8M oz/year
+- **Olimpiada Gold Mine** (Russia) - 1.2M oz/year
+- **Boddington Gold Mine** (Australia) - 700K oz/year
+
+### **Copper Mines (4)**
+- **Escondida** (Chile) - 1.2M tons/year
+- **Collahuasi** (Chile) - 500K tons/year
+- **Oyu Tolgoi** (Mongolia) - 500K tons/year
+- **Olympic Dam** (Australia) - 200K tons/year
+
+### **Mixed Mineral Mines (3)**
+- **Olympic Dam** (Australia) - Multi-commodity
+- **Grasberg** (Indonesia) - Copper & Gold
+- **Oyu Tolgoi** (Mongolia) - Copper & Gold
+
+### **Iron Ore Mines (3)**
+- **Carajás Mine** (Brazil) - 150M tons/year
+- **Pilbara Operations** (Australia) - 300M tons/year
+- **Mount Whaleback** (Australia) - 80M tons/year
+
+### **Diamond Mines (3)**
+- **Jwaneng Mine** (Botswana) - 15M carats/year
+- **Orapa Mine** (Botswana) - 20M carats/year
+- **Catoca Mine** (Angola) - 7M carats/year
+
+### **Seed Data Features**
+- ✅ **Real coordinates** for all mines
+- ✅ **Production data** and descriptions
+- ✅ **Company websites** and operator information
+- ✅ **Regional classifications** by country/state
+- ✅ **Multiple mineral types** (Gold, Copper, Iron, Diamond)
+- ✅ **Admin user account** (email: admin@goldminemap.com, password: admin123)
+
+### **Running the Seed**
+```bash
+# Seed the database with all mine data
+npx prisma db seed
+
+# Or reset and seed (clears all data first)
+npx prisma migrate reset
+```
 
 ## 🗄️ Database Schema
 
@@ -103,6 +152,10 @@ The app uses NextAuth.js with credentials provider:
 - **Sign Up**: `/auth/signup` - Create new account
 - **Sign In**: `/auth/signin` - Login to existing account
 - **Protected Routes**: Main dashboard requires authentication
+
+### **Default Admin Account**
+- **Email**: admin@goldminemap.com
+- **Password**: admin123
 
 ## 📱 Mobile Features
 
@@ -147,6 +200,7 @@ The app uses NextAuth.js with credentials provider:
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 - `npx prisma studio` - Open database GUI
+- `npx prisma db seed` - Seed database with mine data
 
 ### Database Management
 
@@ -162,6 +216,9 @@ npx prisma migrate reset
 
 # Open Prisma Studio
 npx prisma studio
+
+# Seed database with mine data
+npx prisma db seed
 ```
 
 ## 📊 API Endpoints
