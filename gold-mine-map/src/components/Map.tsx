@@ -5,54 +5,28 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import { MapPin, Info, Globe } from 'lucide-react';
 
-// Sample mine data - in a real app, this would come from an API
-const sampleMines = [
-  {
-    id: 1,
-    name: "Carlin Gold Mine",
-    type: "Gold",
-    location: [40.7128, -116.1619],
-    country: "USA",
-    production: "1.2M oz/year",
-    status: "Active"
-  },
-  {
-    id: 2,
-    name: "Grasberg Mine",
-    type: "Copper & Gold",
-    location: [-4.0584, 137.1164],
-    country: "Indonesia",
-    production: "2.5M oz gold/year",
-    status: "Active"
-  },
-  {
-    id: 3,
-    name: "Olympic Dam",
-    type: "Copper, Uranium, Gold",
-    location: [-30.4444, 136.8869],
-    country: "Australia",
-    production: "200K oz gold/year",
-    status: "Active"
-  },
-  {
-    id: 4,
-    name: "Escondida",
-    type: "Copper",
-    location: [-24.2667, -69.0833],
-    country: "Chile",
-    production: "1.2M tons copper/year",
-    status: "Active"
-  },
-  {
-    id: 5,
-    name: "Oyu Tolgoi",
-    type: "Copper & Gold",
-    location: [43.0167, 106.8667],
-    country: "Mongolia",
-    production: "500K oz gold/year",
-    status: "Active"
-  }
-];
+interface Mine {
+  id: string;
+  name: string;
+  type: string;
+  latitude: number;
+  longitude: number;
+  country: string;
+  region?: string;
+  production?: string;
+  status: string;
+  description?: string;
+  website?: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+interface MapProps {
+  mines: Mine[];
+}
 
 // Custom marker icon
 const createCustomIcon = (type: string) => {
@@ -60,7 +34,9 @@ const createCustomIcon = (type: string) => {
     'Gold': '#FFD700',
     'Copper': '#B87333',
     'Copper & Gold': '#FFA500',
-    'Copper, Uranium, Gold': '#FF6347'
+    'Copper, Uranium, Gold': '#FF6347',
+    'Iron': '#8B4513',
+    'Diamond': '#B9F2FF'
   };
   
   return new Icon({
@@ -76,7 +52,7 @@ const createCustomIcon = (type: string) => {
   });
 };
 
-export default function Map() {
+export default function Map({ mines }: MapProps) {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -106,10 +82,10 @@ export default function Map() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {sampleMines.map((mine) => (
+        {mines.map((mine) => (
           <Marker
             key={mine.id}
-            position={mine.location as [number, number]}
+            position={[mine.latitude, mine.longitude]}
             icon={createCustomIcon(mine.type)}
           >
             <Popup>
@@ -118,7 +94,12 @@ export default function Map() {
                 <div className="space-y-1 text-sm">
                   <p><span className="font-semibold">Type:</span> {mine.type}</p>
                   <p><span className="font-semibold">Country:</span> {mine.country}</p>
-                  <p><span className="font-semibold">Production:</span> {mine.production}</p>
+                  {mine.region && (
+                    <p><span className="font-semibold">Region:</span> {mine.region}</p>
+                  )}
+                  {mine.production && (
+                    <p><span className="font-semibold">Production:</span> {mine.production}</p>
+                  )}
                   <p><span className="font-semibold">Status:</span> 
                     <span className={`ml-1 px-2 py-1 rounded-full text-xs ${
                       mine.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -126,6 +107,9 @@ export default function Map() {
                       {mine.status}
                     </span>
                   </p>
+                  {mine.user && (
+                    <p><span className="font-semibold">Added by:</span> {mine.user.name}</p>
+                  )}
                 </div>
               </div>
             </Popup>

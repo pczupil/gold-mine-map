@@ -1,36 +1,206 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏔️ Gold Mine Map - Global Mineral Tracking
 
-## Getting Started
+A comprehensive Next.js application for tracking mineral mines across the world with user authentication, database storage, and mobile-responsive design.
 
-First, run the development server:
+## ✨ Features
+
+- **Interactive Global Map**: Real-time mine locations with Leaflet.js
+- **User Authentication**: Secure login/signup with NextAuth.js
+- **Database Storage**: PostgreSQL with Prisma ORM
+- **Mobile-First Design**: Responsive interface for all devices
+- **Mine Management**: Add, view, and filter mines by type
+- **Real-time Statistics**: Dynamic dashboard with mine counts
+- **User Contributions**: Users can add their own mine data
+
+## 🚀 Tech Stack
+
+- **Frontend**: Next.js 15, React, TypeScript
+- **Styling**: Tailwind CSS
+- **Maps**: Leaflet.js, React-Leaflet
+- **Authentication**: NextAuth.js
+- **Database**: PostgreSQL with Prisma ORM
+- **Icons**: Lucide React
+- **Deployment**: Vercel-ready
+
+## 📋 Prerequisites
+
+- Node.js 18+ 
+- PostgreSQL database
+- Git
+
+## 🛠️ Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/pczupil/gold-mine-map.git
+   cd gold-mine-map
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   # Copy the example environment file
+   cp .env.local.example .env.local
+   ```
+
+   Update `.env.local` with your configuration:
+   ```env
+   # Database
+   DATABASE_URL="postgresql://username:password@localhost:5432/gold_mine_map"
+   
+   # NextAuth
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXTAUTH_SECRET="your-secret-key-here"
+   ```
+
+4. **Set up the database**
+   ```bash
+   # Generate Prisma client
+   npx prisma generate
+   
+   # Run database migrations
+   npx prisma migrate dev --name init
+   
+   # (Optional) Seed the database with sample data
+   npx prisma db seed
+   ```
+
+5. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+6. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 🗄️ Database Schema
+
+The application uses the following main models:
+
+### Users
+- Authentication and user management
+- Can add and manage their own mines
+
+### Mines
+- Location data (latitude, longitude)
+- Mine type and production information
+- Status tracking (Active, Inactive, Planned)
+- User attribution
+
+### Mine Details
+- Detailed mineral information
+- Production data and reserves
+- Historical data tracking
+
+## 🔐 Authentication
+
+The app uses NextAuth.js with credentials provider:
+
+- **Sign Up**: `/auth/signup` - Create new account
+- **Sign In**: `/auth/signin` - Login to existing account
+- **Protected Routes**: Main dashboard requires authentication
+
+## 📱 Mobile Features
+
+- Responsive design that works on all screen sizes
+- Touch-optimized map interactions
+- Mobile navigation with bottom tab bar
+- Optimized loading states
+
+## 🗺️ Map Features
+
+- Interactive global map with OpenStreetMap tiles
+- Color-coded markers by mineral type
+- Clickable popups with detailed mine information
+- Real-time data from database
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+1. **Connect your repository to Vercel**
+2. **Set environment variables** in Vercel dashboard
+3. **Deploy automatically** on push to main branch
+
+### Manual Deployment
+
+1. **Build the application**
+   ```bash
+   npm run build
+   ```
+
+2. **Start production server**
+   ```bash
+   npm start
+   ```
+
+## 🔧 Development
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npx prisma studio` - Open database GUI
+
+### Database Management
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Generate Prisma client after schema changes
+npx prisma generate
+
+# Create new migration
+npx prisma migrate dev --name migration_name
+
+# Reset database (development only)
+npx prisma migrate reset
+
+# Open Prisma Studio
+npx prisma studio
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📊 API Endpoints
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Authentication
+- `POST /api/auth/register` - User registration
+- `GET/POST /api/auth/[...nextauth]` - NextAuth.js endpoints
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Mines
+- `GET /api/mines` - Get all mines (with optional filters)
+- `POST /api/mines` - Create new mine (authenticated)
+- `GET /api/mines/[id]` - Get specific mine
+- `PUT /api/mines/[id]` - Update mine (authenticated)
+- `DELETE /api/mines/[id]` - Delete mine (authenticated)
 
-## Learn More
+## 🤝 Contributing
 
-To learn more about Next.js, take a look at the following resources:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📝 License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Deploy on Vercel
+## 🙏 Acknowledgments
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [Next.js](https://nextjs.org/) for the amazing React framework
+- [Prisma](https://prisma.io/) for the type-safe database toolkit
+- [NextAuth.js](https://next-auth.js.org/) for authentication
+- [Leaflet](https://leafletjs.com/) for interactive maps
+- [Tailwind CSS](https://tailwindcss.com/) for utility-first CSS
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📞 Support
+
+If you have any questions or need help, please open an issue on GitHub or contact the maintainers.
+
+---
+
+**Happy mining! 🏔️✨**

@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { Search, Filter, BarChart3, Globe, MapPin, Info } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useSession, signOut } from 'next-auth/react';
+import { Search, Filter, BarChart3, Globe, MapPin, Info, User, LogOut, Plus } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
 // Dynamically import the Map component to avoid SSR issues
 const Map = dynamic(() => import('@/components/Map'), {
@@ -17,24 +19,108 @@ const Map = dynamic(() => import('@/components/Map'), {
   )
 });
 
+interface Mine {
+  id: string;
+  name: string;
+  type: string;
+  latitude: number;
+  longitude: number;
+  country: string;
+  region?: string;
+  production?: string;
+  status: string;
+  description?: string;
+  website?: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
 export default function Home() {
+  const { data: session, status } = useSession();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const [mines, setMines] = useState<Mine[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const stats = [
-    { label: 'Total Mines', value: '1,247', icon: MapPin, color: 'text-blue-600' },
-    { label: 'Active Mines', value: '1,089', icon: Globe, color: 'text-green-600' },
-    { label: 'Countries', value: '67', icon: BarChart3, color: 'text-purple-600' },
-    { label: 'Mineral Types', value: '12', icon: Info, color: 'text-orange-600' }
+    { label: 'Total Mines', value: mines.length.toString(), icon: MapPin, color: 'text-blue-600' },
+    { label: 'Active Mines', value: mines.filter(m => m.status === 'Active').length.toString(), icon: Globe, color: 'text-green-600' },
+    { label: 'Countries', value: [...new Set(mines.map(m => m.country))].length.toString(), icon: BarChart3, color: 'text-purple-600' },
+    { label: 'Mineral Types', value: [...new Set(mines.map(m => m.type))].length.toString(), icon: Info, color: 'text-orange-600' }
   ];
 
   const filters = [
     { id: 'all', label: 'All Mines' },
-    { id: 'gold', label: 'Gold' },
-    { id: 'copper', label: 'Copper' },
-    { id: 'iron', label: 'Iron' },
-    { id: 'diamond', label: 'Diamond' }
+    { id: 'Gold', label: 'Gold' },
+    { id: 'Copper', label: 'Copper' },
+    { id: 'Iron', label: 'Iron' },
+    { id: 'Diamond', label: 'Diamond' }
   ];
+
+  // Fetch mines from API
+  useEffect(() => {
+    const fetchMines = async () => {
+      try {
+        const response = await fetch('/api/mines');
+        if (response.ok) {
+          const data = await response.json();
+          setMines(data);
+        }
+      } catch (error) {
+        console.error('Error fetching mines:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMines();
+  }, []);
+
+  const handleSignOut = () => {
+    signOut({ callbackUrl: '/auth/signin' });
+  };
+
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <Globe className="w-12 h-12 mx-auto mb-4 text-gray-400 animate-spin" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <MapPin className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Welcome to Gold Mine Map</h1>
+          <p className="text-gray-600 mb-8">Sign in to access the global mineral mine tracking system</p>
+          <div className="space-y-4">
+            <Link
+              href="/auth/signin"
+              className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            >
+              Sign In
+            </Link>
+            <div className="text-sm text-gray-500">
+              Don't have an account?{' '}
+              <Link href="/auth/signup" className="text-blue-600 hover:text-blue-500">
+                Sign up
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -52,16 +138,33 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Search Bar */}
-            <div className="relative w-full sm:w-80">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search mines, locations..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+            <div className="flex items-center space-x-4">
+              {/* Search Bar */}
+              <div className="relative w-full sm:w-80">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search mines, locations..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* User Menu */}
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2">
+                  <User className="w-5 h-5 text-gray-600" />
+                  <span className="text-sm font-medium text-gray-700">{session.user?.name}</span>
+                </div>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center space-x-1 text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="text-sm">Sign out</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -87,9 +190,18 @@ export default function Home() {
 
         {/* Filters */}
         <div className="mb-6">
-          <div className="flex items-center mb-3">
-            <Filter className="w-5 h-5 text-gray-600 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900">Filter by Mineral Type</h3>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center">
+              <Filter className="w-5 h-5 text-gray-600 mr-2" />
+              <h3 className="text-lg font-semibold text-gray-900">Filter by Mineral Type</h3>
+            </div>
+            <Link
+              href="/mines/add"
+              className="flex items-center space-x-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Mine</span>
+            </Link>
           </div>
           <div className="flex flex-wrap gap-2">
             {filters.map((filter) => (
@@ -127,7 +239,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <Map />
+          <Map mines={mines} />
         </div>
 
         {/* Mobile-friendly info section */}
@@ -141,6 +253,7 @@ export default function Home() {
                 <li>• Real-time mine status and production data</li>
                 <li>• Mobile-responsive design</li>
                 <li>• Filter by mineral type and location</li>
+                <li>• User authentication and data management</li>
               </ul>
             </div>
             <div>
@@ -149,7 +262,7 @@ export default function Home() {
                 <li>• Global mining databases</li>
                 <li>• Government mining registries</li>
                 <li>• Industry reports and publications</li>
-                <li>• Updated quarterly</li>
+                <li>• User-contributed data</li>
               </ul>
             </div>
           </div>
@@ -172,8 +285,8 @@ export default function Home() {
             <span className="text-xs">Search</span>
           </button>
           <button className="flex flex-col items-center p-2 text-gray-600">
-            <Info className="w-5 h-5 mb-1" />
-            <span className="text-xs">Info</span>
+            <User className="w-5 h-5 mb-1" />
+            <span className="text-xs">Profile</span>
           </button>
         </div>
       </div>
