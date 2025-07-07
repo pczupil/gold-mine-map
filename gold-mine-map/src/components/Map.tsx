@@ -22,6 +22,8 @@ interface Mine {
     name: string;
     email: string;
   };
+  photos?: { url: string }[];
+  photoUrls?: string[];
 }
 
 interface MapProps {
@@ -89,7 +91,30 @@ export default function Map({ mines }: MapProps) {
             icon={createCustomIcon(mine.type)}
           >
             <Popup>
-              <div className="p-2">
+              <div className="p-2 min-w-[220px] max-w-[320px]">
+                {/* Photo Gallery */}
+                {(mine.photos?.length || mine.photoUrls?.length) && (
+                  <div className="mb-2">
+                    <div className="flex gap-2 overflow-x-auto pb-2">
+                      {(mine.photos || []).map((photo, idx) => (
+                        <img
+                          key={photo.url + idx}
+                          src={photo.url}
+                          alt="Mine photo"
+                          className="w-24 h-20 object-cover rounded border"
+                        />
+                      ))}
+                      {(mine.photoUrls || []).map((url, idx) => (
+                        <img
+                          key={url + idx}
+                          src={url}
+                          alt="Mine photo"
+                          className="w-24 h-20 object-cover rounded border"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <h3 className="font-bold text-lg mb-2">{mine.name}</h3>
                 <div className="space-y-1 text-sm">
                   <p><span className="font-semibold">Type:</span> {mine.type}</p>

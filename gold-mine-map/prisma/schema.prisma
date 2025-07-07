@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -65,7 +62,7 @@ model VerificationToken {
 
 // Mine Models
 model Mine {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   name        String
   type        String   // Gold, Copper, Iron, etc.
   latitude    Float
@@ -85,6 +82,7 @@ model Mine {
   
   // Additional mine details
   mineDetails MineDetail[]
+  photos      Photo[]
   
   @@index([type])
   @@index([country])
@@ -108,4 +106,12 @@ model MineDetail {
   
   @@index([mineId])
   @@index([mineralType])
+}
+
+model Photo {
+  id      String  @id @default(uuid())
+  url     String
+  mine    Mine    @relation(fields: [mineId], references: [id])
+  mineId  String
+  // Optionally: createdAt DateTime @default(now())
 }

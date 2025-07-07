@@ -45,6 +45,18 @@ export default function Home() {
   const [mines, setMines] = useState<Mine[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Filter mines based on selected filter and search term
+  const filteredMines = mines.filter(mine => {
+    const matchesFilter = selectedFilter === 'all' || mine.type.includes(selectedFilter);
+    const matchesSearch = searchTerm === '' || 
+      mine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      mine.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      mine.region?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      mine.type.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesFilter && matchesSearch;
+  });
+
   const stats = [
     { label: 'Total Mines', value: mines.length.toString(), icon: MapPin, color: 'text-blue-600' },
     { label: 'Active Mines', value: mines.filter(m => m.status === 'Active').length.toString(), icon: Globe, color: 'text-green-600' },
@@ -52,12 +64,22 @@ export default function Home() {
     { label: 'Mineral Types', value: [...new Set(mines.map(m => m.type))].length.toString(), icon: Info, color: 'text-orange-600' }
   ];
 
+  // Filtered stats for display
+  const filteredStats = [
+    { label: 'Showing', value: filteredMines.length.toString(), icon: MapPin, color: 'text-blue-600' },
+    { label: 'Active', value: filteredMines.filter(m => m.status === 'Active').length.toString(), icon: Globe, color: 'text-green-600' },
+    { label: 'Countries', value: [...new Set(filteredMines.map(m => m.country))].length.toString(), icon: BarChart3, color: 'text-purple-600' },
+    { label: 'Types', value: [...new Set(filteredMines.map(m => m.type))].length.toString(), icon: Info, color: 'text-orange-600' }
+  ];
+
   const filters = [
     { id: 'all', label: 'All Mines' },
     { id: 'Gold', label: 'Gold' },
     { id: 'Copper', label: 'Copper' },
     { id: 'Iron', label: 'Iron' },
-    { id: 'Diamond', label: 'Diamond' }
+    { id: 'Diamond', label: 'Diamond' },
+    { id: 'Silver', label: 'Silver' },
+    { id: 'Platinum', label: 'Platinum' }
   ];
 
   // Fetch mines from API
@@ -149,6 +171,16 @@ export default function Home() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
               </div>
 
               {/* User Menu */}
@@ -173,7 +205,7 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {stats.map((stat) => (
+          {filteredStats.map((stat) => (
             <div key={stat.label} className="bg-white rounded-lg shadow-sm p-4 border">
               <div className="flex items-center">
                 <div className={`p-2 rounded-lg bg-gray-50 ${stat.color}`}>
@@ -217,13 +249,33 @@ export default function Home() {
                 {filter.label}
               </button>
             ))}
+            {(selectedFilter !== 'all' || searchTerm) && (
+              <button
+                onClick={() => {
+                  setSelectedFilter('all');
+                  setSearchTerm('');
+                }}
+                className="px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 border border-gray-300 hover:bg-gray-200 transition-colors"
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
         </div>
 
         {/* Map Container */}
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">Global Mine Locations</h2>
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">Global Mine Locations</h2>
+              {(selectedFilter !== 'all' || searchTerm) && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Showing {filteredMines.length} of {mines.length} mines
+                  {selectedFilter !== 'all' && ` (filtered by ${selectedFilter})`}
+                  {searchTerm && ` (searching for "${searchTerm}")`}
+                </p>
+              )}
+            </div>
             <div className="flex items-center space-x-2 text-sm text-gray-600">
               <div className="flex items-center">
                 <div className="w-3 h-3 bg-yellow-400 rounded-full mr-1"></div>
@@ -239,7 +291,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <Map mines={mines} />
+          <Map mines={filteredMines} />
         </div>
 
         {/* Mobile-friendly info section */}
