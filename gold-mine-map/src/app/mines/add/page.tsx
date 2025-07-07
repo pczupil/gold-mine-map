@@ -15,7 +15,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import Link from 'next/link';
-import CloudinaryUploadWidget from './CloudinaryUploadWidget';
+import CloudinaryUploadWidget from '../../../components/CloudinaryUploadWidget';
 
 interface MineFormData {
   name: string;
@@ -481,28 +481,20 @@ export default function AddMine() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Link href="/" className="mr-4">
-                <ArrowLeft className="w-6 h-6 text-gray-600 hover:text-gray-800" />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Add New Mine</h1>
-                <p className="text-sm text-gray-600">Contribute to the global mine database</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Globe className="w-5 h-5 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">{session.user?.name}</span>
-            </div>
+      {/* Page Header */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <div className="flex items-center mb-6">
+          <Link href="/" className="mr-4">
+            <ArrowLeft className="w-6 h-6 text-gray-600 hover:text-gray-800" />
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Add New Mine</h1>
+            <p className="text-sm text-gray-600">Contribute to the global mine database</p>
           </div>
         </div>
-      </header>
+      </div>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (

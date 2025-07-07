@@ -1,4 +1,8 @@
+'use client';
 import { useState } from 'react';
+
+const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
 export default function CloudinaryUploadWidget({ onUpload }: { onUpload: (url: string) => void }) {
   const [uploading, setUploading] = useState(false);
@@ -8,8 +12,8 @@ export default function CloudinaryUploadWidget({ onUpload }: { onUpload: (url: s
     // @ts-ignore
     window.cloudinary.openUploadWidget(
       {
-        cloudName: 'YOUR_CLOUD_NAME', // TODO: Replace with your Cloudinary cloud name
-        uploadPreset: 'mines_unsigned', // TODO: Replace with your unsigned preset name
+        cloudName: cloudName,
+        uploadPreset: uploadPreset,
         sources: ['local', 'url', 'camera'],
         multiple: true,
         folder: 'mines',

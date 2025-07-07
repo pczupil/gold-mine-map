@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import { MapPin, Info, Globe } from 'lucide-react';
+import CloudinaryUploadWidget from './CloudinaryUploadWidget';
+import MinePhotoGallery from './MinePhotoGallery';
+import Link from 'next/link';
 
 interface Mine {
   id: string;
@@ -56,10 +59,18 @@ const createCustomIcon = (type: string) => {
 
 export default function Map({ mines }: MapProps) {
   const [isClient, setIsClient] = useState(false);
+  const [popupPhotoUrls, setPopupPhotoUrls] = useState<{ [mineId: string]: string[] }>({});
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const handlePopupUpload = (mineId: string, url: string) => {
+    setPopupPhotoUrls((prev) => ({
+      ...prev,
+      [mineId]: [...(prev[mineId] || []), url],
+    }));
+  };
 
   if (!isClient) {
     return (
@@ -92,29 +103,16 @@ export default function Map({ mines }: MapProps) {
           >
             <Popup>
               <div className="p-2 min-w-[220px] max-w-[320px]">
-                {/* Photo Gallery */}
-                {(mine.photos?.length || mine.photoUrls?.length) && (
-                  <div className="mb-2">
-                    <div className="flex gap-2 overflow-x-auto pb-2">
-                      {(mine.photos || []).map((photo, idx) => (
-                        <img
-                          key={photo.url + idx}
-                          src={photo.url}
-                          alt="Mine photo"
-                          className="w-24 h-20 object-cover rounded border"
-                        />
-                      ))}
-                      {(mine.photoUrls || []).map((url, idx) => (
-                        <img
-                          key={url + idx}
-                          src={url}
-                          alt="Mine photo"
-                          className="w-24 h-20 object-cover rounded border"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
+                <MinePhotoGallery
+                  mineId={mine.id}
+                  initialPhotos={mine.photos}
+                  initialPhotoUrls={mine.photoUrls}
+                />
+                <div className="flex justify-end mt-2">
+                  <Link href={`/mines/${mine.id}`} className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                    View
+                  </Link>
+                </div>
                 <h3 className="font-bold text-lg mb-2">{mine.name}</h3>
                 <div className="space-y-1 text-sm">
                   <p><span className="font-semibold">Type:</span> {mine.type}</p>
